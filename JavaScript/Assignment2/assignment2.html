@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>search books</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+ </head>
+ <body>
+  <br /><br />
+  <div class="container" style="width:900px;">
+   <h2 align="center">Search for books</h2>  
+   <br /><br />
+   <div align="center">
+    <input type="text" name="search" id="search" placeholder="Search books" class="form-control" />
+   </div>
+   <ul class="list-group" id="result"></ul>
+   <br />
+   <div id="output" class="group"></div>
+  </div>
+ </body>
+</html>
+
+<script>
+$(document).ready(function(){
+ $.ajaxSetup({ cache: false });
+ $('#search').keyup(function(){
+  $('#result').html('');
+  $("#output").text('');
+  $('#state').val('');
+  var searchField = $('#search').val();
+  var expression = new RegExp(searchField, "i");
+  $.getJSON('books.json', function(books) {
+   $.each(books, function(key, value){
+    if (value.name.search(expression) != -1)
+    {
+     $('#result').append('<li class="list-group-item link-class">'+value.name+'</li>');
+    }
+   });   
+  });
+ });
+ $('#result').on('click', 'li', function() {
+  var click_text = $(this).text().split('|');
+  $('#search').val($.trim(click_text[0]));
+  $("#result").html('');
+  $.getJSON('books.json', function(books) {
+   $.each(books, function(key, value){
+       if(value.name==click_text)
+       {
+var add='https://openlibrary.org/api/books?bibkeys=ISBN:'+value.isbn+'&jscmd=details&format=json';
+
+  $.getJSON(add, function(data)
+  {
+    var txt="";
+      console.log(data);
+    $.each(data, function(key, value){
+
+        $('#output').append("<div id='coverphoto'><img src="+value.thumbnail_url+"></div>");
+        var addr='https://openlibrary.org'+value.details.authors[0].key+'.json';
+        localStorage.setItem("address",addr);
+        $('#output').append("<p class='group-item id='name'><b> Name :</b>"+value.details.authors[0].name+"</p>");
+        $('#output').append("<p class='group-item'><b> Description :</b>"+value.details.description+"</p>");
+        $('#output').append("<p class='group-item'><b> Number of pages:</b>"+value.details.number_of_pages+"</p>");
+        $('#output').append("<p class='group-item'><b> Subject of books :</b>"+value.details.subjects+"</p>");
+        if(value.details.table_of_contents!=undefined)
+        {
+        for(i=0;i<value.details.table_of_contents.length;i++)
+        {
+            txt+=value.details.table_of_contents[i].title+",";
+        }
+        }
+        $('#output').append("<p class='group-item'><b> table of content :</b>"+txt+"</p>");
+        $('#output').append("<p class='group-item'><b> Publish date :</b>"+value.details.publish_date+"</p>");
+        $('#output').append("<p class='group-item'><b> publish country :</b>"+value.details.publish_country+"</p>");
+        
+    $("#search").val("");
+  });
+       
+      //  txtconsole.log(value.details.authors[0].key);
+   //console.log(value.details.authors[0].name);
+   //console.log(value.details.publish_date);
+   //console.log(value.details.description);
+   //console.log(value.details.number_of_pages);
+   //console.log(value.details.publish_country);
+   //console.log(value.details.subjects);
+   //console.log(value.details.table_of_contents[0].title);
+    });
+}
+});
+});
+ });
+ $("#output").click(function()
+ {
+address=localStorage.getItem("address");
+$.getJSON(address, function(data)
+            {
+              console.log(data);
+                document.writeln("<style>body{background-color:crimson}</style><br/><br/><br/><br/><div style ='background-color: aliceblue;color: black; border: black;border-radius: 5px;'><center style=''><h1>Author Details</h1><p><b>Author Name:</b>"+data.personal_name+"</p><p><b>Date of Birth :</b>"+data.birth_date+"<p><b>Alternate Names :</b>"+data.alternate_names+"</p></center></div>");
+              });
+ });
+});
+</script>

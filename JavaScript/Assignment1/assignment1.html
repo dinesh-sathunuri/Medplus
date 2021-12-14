@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Assignment</title>
+    
+</head>
+<body>
+    <div id="group">
+    <p><textarea id="input" cols="185" rows="5"></textarea></p>
+    <center><p> <button onclick="add()">ADD</button>
+        <button onclick="edit1()">EDIT</button>
+        <button onclick="del()">DELETE</button></p>
+        <ul class="list-group" id="output"></ul></center>
+    </div>
+    <script>
+        var txt='';
+        var reference;
+            function add()
+            {
+                var new_store=document.getElementById('input').value;
+                document.getElementById('input').value="";
+                if(new_store!='')
+                {
+                if(localStorage.getItem('data')==null)
+                {
+                    localStorage.setItem('data','[]')
+                }
+                var old_store=JSON.parse(localStorage.getItem('data'));
+                old_store.push(new_store);
+                localStorage.setItem('data',JSON.stringify(old_store));
+                display();
+            }
+                else
+                 {
+                     alert("Enter the sentance");
+                 }
+                 }
+                 function display()
+                 {
+                    var retriev=JSON.parse(localStorage.getItem('data'));
+               var text = "<ul>";
+             for (i = 0; i < retriev.length; i++) {
+                text += "<center><li class='list-group-item link-class' onclick='edit("+i+")' id="+i+" >" + retriev[i] + "</li>";
+                    }
+            text += "</ul>";
+            document.getElementById("output").innerHTML=text;
+                 }
+                 
+            function edit(i)
+            {
+                reference=i;
+                document.getElementById('input').value=document.getElementById(i).innerHTML;
+            }
+            function edit1()
+            {
+                if(document.getElementById('input').value!='')
+                {
+                var new1 =document.getElementById('input').value;
+                document.getElementById('input').value="";
+                var check=JSON.parse(localStorage.getItem('data'));
+                    check[reference]=new1;
+                localStorage.setItem('data',JSON.stringify(check));
+                display();
+              
+                }
+                else
+                {
+                    alert("Select the Sentence");
+                }
+            }
+            function del()
+            {
+                if(document.getElementById('input').value!='')
+                {
+                deletevar=JSON.parse(localStorage.getItem("data"));
+                document.getElementById('input').value="";
+                deletevar.splice(reference,1);
+                localStorage.setItem('data',JSON.stringify(deletevar));
+                display();
+                }
+                else
+                {
+                    alert("Select the sentence");
+                }
+            }
+    </script>
+</body>
+</html>
